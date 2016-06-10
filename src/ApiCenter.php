@@ -1,15 +1,26 @@
 <?php
 
-namespace Ufox;
+namespace app\MyClass;
 
 use Illuminate\Support\Facades\Config;
 
 class ApiCenter
 {
+    public function getCep($cep){
+        return $this->curl( $this->getUrl( 'consulta_cep' ) . $cep );
+    }
+
+    public function getUrl($apiName){
+        $retorno = $this->curl( config('app.url_api_center').$apiName.'/'.config('app.env') );
+        $retorno = json_decode($retorno);
+        return $retorno->url;
+
+    }
+
     private function curl ($url, array $options = [])
     {
-        $timeout = 5;
-        $connectionTimeout = 2;
+        $timeout           = 5;
+        $connectionTimeout = 3;
 
         $ch = curl_init();
 
