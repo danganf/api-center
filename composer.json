@@ -1,0 +1,19 @@
+{
+	"name":              "ufox/api-center",
+    "description":       "Centralizador de APIs",
+    "type":              "library",
+    "license":           "MIT",
+    "authors": [
+        {
+            "name":     "Daniel Azevedo",
+            "email":    "danielazevedo2k12@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3,<8.0-DEV",
+		"laravel/framework": "5.*"
+    },
+    "autoload": {
+        "psr-4": {"Ufox\\": "src/"}
+    }
+}
