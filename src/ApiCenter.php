@@ -2,12 +2,26 @@
 
 namespace app\MyClass;
 
-use Illuminate\Support\Facades\Config;
-
 class ApiCenter
 {
     public function getCep($cep){
         return $this->curl( $this->getUrl( 'consulta_cep' ) . $cep );
+    }
+
+    public function getIp($ip){
+        return $this->curl( $this->getUrl( 'consulta_ip' ) . $ip );
+    }
+
+    public function getOperadora($telefone){
+        return $this->curl( $this->getUrl( 'consulta_operadora' ) . $telefone );
+    }
+
+    public function getVencimentoOperadora($operadora){
+        return $this->curl( $this->getUrl( 'consulta_vencimento' ) . $operadora );
+    }
+
+    public function getInfoCPF($cpf){
+        return $this->curl( $this->getUrl( 'consulta_cpf' ) . $cpf );
     }
 
     public function getUrl($apiName){

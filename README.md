@@ -7,7 +7,7 @@
 ```
 'url_api_center' => env('URL_API_CENTER', URL_API_CENTER),#terminada com `/`
 ```
-2 - no mesmo arquivo, certifique-se que APP_ENV esta setado como `production`
+2 - no mesmo arquivo, certifique-se que APP_ENV esteja setado como `production`
 
 3 - no arquivo .env, cria as seguintes linhas:
 
