@@ -1,6 +1,6 @@
 <?php
 
-namespace app\MyClass;
+namespace Ufox;
 
 class ApiCenter
 {
