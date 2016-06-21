@@ -24,6 +24,10 @@ class ApiCenter
         return $this->curl( $this->getUrl( 'consulta_cpf' ) . $cpf );
     }
 
+    public function getInfoCodRastreamento( $codigo ){
+        return $this->curl( $this->getUrl( 'consulta_cod_rastreamento' ) . $codigo );
+    }
+
     public function getUrl($apiName){
         $retorno = $this->curl( config('app.url_api_center').$apiName.'/'.config('app.env') );
         $retorno = json_decode($retorno);
