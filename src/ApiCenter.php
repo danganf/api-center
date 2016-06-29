@@ -28,10 +28,24 @@ class ApiCenter
         return $this->curl( $this->getUrl( 'consulta_cod_rastreamento' ) . $codigo );
     }
 
+    public function getPlanos( $ddd, $operadora = 'VIVO', $tipo = 'controle' ){
+        return $this->curl( $this->getUrl( 'consulta_planos' ) . "?operadora=$operadora&ddd=$ddd&tipo=$tipo" );
+    }
+
     public function getUrl($apiName){
         $retorno = $this->curl( config('app.url_api_center').$apiName.'/'.config('app.env') );
-        $retorno = json_decode($retorno);
-        return $retorno->url;
+        return $retorno['url'];
+
+    }
+
+    private function parseReturn( $jsonString ){
+
+        $json = json_decode( $jsonString, TRUE );
+        $retorno = FALSE;
+        if( !isset( $json['error'] ) ) {
+            $retorno = $json;
+        }
+        return $retorno;
 
     }
 
@@ -86,6 +100,6 @@ class ApiCenter
         $result = curl_exec($ch);
         curl_close($ch);
 
-        return $result;
+        return $this->parseReturn( $result );
     }
 }
