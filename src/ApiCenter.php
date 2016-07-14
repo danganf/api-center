@@ -24,12 +24,24 @@ class ApiCenter
         return $this->curl( $this->getUrl( 'consulta_cpf' ) . $cpf );
     }
 
+    public function getValidaDados( $cpf, $nome, $mae, $dataNasc ){
+        return $this->curl( $this->getUrl( 'valida_dados' ), [
+            'json' => true,
+            'post' => true,
+            'data' => json_encode( [ 'cpf'=>$cpf, 'nome_completo'=>$nome, 'mae'=>$mae, 'data_nascimento'=>$dataNasc ] )
+        ] );
+    }
+
     public function getInfoCodRastreamento( $codigo ){
         return $this->curl( $this->getUrl( 'consulta_cod_rastreamento' ) . $codigo );
     }
 
-    public function getPlanos( $ddd, $operadora = 'VIVO', $tipo = 'controle' ){
+    public function getPlanos( $ddd, $tipo = 'controle', $operadora = 'VIVO' ){
         return $this->curl( $this->getUrl( 'consulta_planos' ) . "?operadora=$operadora&ddd=$ddd&tipo=$tipo" );
+    }
+
+    public function getStoreMagento(){
+        return $this->curl( $this->getUrl( 'get_store' ) );
     }
 
     public function getUrl($apiName){
