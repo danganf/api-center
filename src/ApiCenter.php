@@ -79,6 +79,14 @@ class ApiCenter
         return $this->curl( $this->getUrl( 'backend_api' ) . '/get', [ 'post' => true, 'backend'=>$sessionID ] );
     }
 
+    public function getIpPermission( $ip, $site ){
+        return $this->curl( $this->getUrl( 'ip_permission' ), [
+            'json' => true,
+            'post' => true,
+            'data' => json_encode( [ 'ip'=>$ip, 'site'=>$site ] )
+        ] );
+    }
+
     public function getUrl($apiName){
         $retorno = $this->curl( config('app.url_api_center').$apiName.'/'.config('app.env') );
         return $retorno['url'];
