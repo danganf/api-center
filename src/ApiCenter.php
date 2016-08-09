@@ -24,14 +24,6 @@ class ApiCenter
         return $this->curl( $this->getUrl( 'consulta_cpf' ) . $cpf );
     }
 
-    public function getValidaDados( $cpf, $nome, $mae, $dataNasc ){
-        return $this->curl( $this->getUrl( 'valida_dados' ), [
-            'json' => true,
-            'post' => true,
-            'data' => json_encode( [ 'cpf'=>$cpf, 'nome_completo'=>$nome, 'mae'=>$mae, 'data_nascimento'=>$dataNasc ] )
-        ] );
-    }
-
     public function getInfoCodRastreamento( $codigo ){
         return $this->curl( $this->getUrl( 'consulta_cod_rastreamento' ) . $codigo );
     }
@@ -42,6 +34,49 @@ class ApiCenter
 
     public function getStoreMagento(){
         return $this->curl( $this->getUrl( 'get_store' ) );
+    }
+
+    public function getEstados(){
+        return $this->curl( $this->getUrl( 'estados' ) );
+    }
+
+    public function getUFPorDDD(){
+        return $this->curl( $this->getUrl( 'uf_por_ddd' ) );
+    }
+
+    public function getDDDPorUf(){
+        return $this->curl( $this->getUrl( 'ddd_por_uf' ) );
+    }
+
+    public function getValidaDados( $cpf, $nome, $mae, $dataNasc ){
+        return $this->curl( $this->getUrl( 'valida_dados' ), [
+            'json' => true,
+            'post' => true,
+            'data' => json_encode( [ 'cpf'=>$cpf, 'nome_completo'=>$nome, 'mae'=>$mae, 'data_nascimento'=>$dataNasc ] )
+        ] );
+    }
+
+    public function createOrderMagento( $stringJson ){
+        $url = str_replace( 'manager_laravel.app','127.0.0.6:8000',$this->getUrl( 'envia_pedido' ) );#php artisan serve --host=127.0.0.6
+        return $this->curl($url, [ 'json' => true, 'post' => true, 'data' => $stringJson ] );
+    }
+
+    public function backEndGetSessionId(){
+        $retorno = $this->curl( $this->getUrl( 'backend_api' ) . '/get-session-id', ['backend'=>TRUE] );
+        return ( isset( $retorno['session_id'] ) ? $retorno['session_id'] : null );
+    }
+
+    public function backEndSaveRegistro( $sessionID, $arrayValores ){
+        $json = json_encode( $arrayValores );
+        return $this->curl( $this->getUrl( 'backend_api' ) . '/registra', [ 'json' => true, 'post' => true, 'data' => $json, 'backend'=>$sessionID ] );
+    }
+
+    public function backEndCreateOrder( $sessionID ){
+        return $this->curl( $this->getUrl( 'backend_api' ) . '/create', [ 'post' => true, 'backend'=>$sessionID ] );
+    }
+
+    public function backEndgetInfoOrder( $sessionID ){
+        return $this->curl( $this->getUrl( 'backend_api' ) . '/get', [ 'post' => true, 'backend'=>$sessionID ] );
     }
 
     public function getUrl($apiName){
@@ -94,10 +129,19 @@ class ApiCenter
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $options['data']);
 
             if (!empty($options['json'])) {
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                        'Content-Type: application/json',
-                        'Content-Length: ' . strlen($options['data']))
-                );
+                $dados[] = 'Content-Type: application/json';
+                $dados[] = 'Content-Length: ' . strlen($options['data']);
+            }
+
+            if ( !empty( $options['backend'] ) ) {
+                $dados[] = 'api-token: '.config('app.api_token');
+                if( !is_bool( $options['backend'] ) ) {
+                    $dados[] = 'session-id: '.$options['backend'];
+                }
+            }
+
+            if( isset( $dados ) ){
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $dados);
             }
         }
 
@@ -110,6 +154,9 @@ class ApiCenter
         curl_setopt($ch, CURLOPT_REFERER, $refer );
 
         $result = curl_exec($ch);
+        if( strpos($url,'get-url-api') === FALSE ) {
+            //var_dump($url.' > '.$result);
+        }
         curl_close($ch);
 
         return $this->parseReturn( $result );
