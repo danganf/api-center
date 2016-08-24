@@ -87,6 +87,14 @@ class ApiCenter
         ] );
     }
 
+    public function getOrderCustomer( $cpf, $codigoPedido=null, $nascimento=null ){
+        return $this->curl( $this->getUrl( 'get_order_customer' ), [
+            'json' => true,
+            'post' => true,
+            'data' => json_encode( [ 'cpf'=>$cpf, 'codigo_pedido'=>$codigoPedido, 'nascimento'=>$nascimento ] )
+        ] );
+    }
+
     public function getUrl($apiName){
         $retorno = $this->curl( config('app.url_api_center').$apiName.'/'.config('app.env') );
         return $retorno['url'];
