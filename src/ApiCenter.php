@@ -96,10 +96,10 @@ class ApiCenter
     }
 
     public function getCheckSMSOnLine(){
-        $ret   = json_decode( $this->curl( $this->getUrl( 'verify_sms' ) ) );
+        $ret   = $this->curl( $this->getUrl( 'verify_sms' ) );
         $flag  = TRUE;
-        if( isset( $ret->status ) ) {
-            $flag = $ret->status;
+        if( isset( $ret['status'] ) ) {
+            $flag = $ret['status'];
         }
         return $flag;
     }
