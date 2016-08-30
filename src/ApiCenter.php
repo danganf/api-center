@@ -104,6 +104,20 @@ class ApiCenter
         return $flag;
     }
 
+    public function senEmail( $codTemplate, $nome, $email, $outrosDados = [] ){
+
+        $dados['cod_template']          = $codTemplate;
+        $dados['destinatario']['nome']  = $nome;
+        $dados['destinatario']['email'] = $email;
+        $dados['data']                  = $outrosDados;
+
+        return $this->curl( $this->getUrl( 'envia_email' ), [
+            'json' => true,
+            'post' => true,
+            'data' => json_encode( $dados )
+        ] );
+    }
+
     public function getUrl($apiName){
         $retorno = $this->curl( config('app.url_api_center').$apiName.'/'.config('app.env') );
         return $retorno['url'];
