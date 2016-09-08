@@ -127,6 +127,14 @@ class ApiCenter
         ] );
     }
 
+    public function sendSMS( $origem, $ddd, $telefone, $mensagem, $ip ){
+        return $this->curl( $this->getUrl( 'envia_sms' ), [
+            'json' => true,
+            'post' => true,
+            'data' => json_encode( [ 'origem'=>$origem, 'ip'=>$ip, 'linha'=>$ddd . $telefone, 'mensagem'=>$mensagem ] )
+        ] );
+    }
+
     public function getUrl($apiName){
         $retorno = $this->curl( config('app.url_api_center').$apiName.'/'.config('app.env') );
         return $retorno['url'];
