@@ -104,7 +104,7 @@ class ApiCenter
         return $flag;
     }
 
-    public function senEmail( $codTemplate, $nome, $email, $outrosDados = [] ){
+    public function sendEmail( $codTemplate, $nome, $email, $outrosDados = [] ){
 
         $dados['cod_template']          = $codTemplate;
         $dados['destinatario']['nome']  = $nome;
@@ -115,6 +115,15 @@ class ApiCenter
             'json' => true,
             'post' => true,
             'data' => json_encode( $dados )
+        ] );
+    }
+
+    public function saveLogAuditing( $arrayValores = [] ){
+
+        return $this->curl( $this->getUrl( 'save_log_auditing' ), [
+            'json' => true,
+            'post' => true,
+            'data' => json_encode( $arrayValores )
         ] );
     }
 
