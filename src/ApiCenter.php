@@ -24,6 +24,10 @@ class ApiCenter
         return $this->curl( $this->getUrl( 'consulta_cpf' ) . $cpf );
     }
 
+    public function getDetalhesSku($sku){
+        return $this->curl( $this->getUrl( 'consulta_detalhe' ) .'?skus='. $sku );
+    }
+
     public function getInfoCodRastreamento( $codigo ){
         return $this->curl( $this->getUrl( 'consulta_cod_rastreamento' ) . $codigo );
     }
