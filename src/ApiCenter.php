@@ -61,22 +61,52 @@ class ApiCenter
         return $this->curl($url, [ 'json' => true, 'post' => true, 'data' => $stringJson ] );
     }
 
-    public function backEndGetSessionId(){
-        $retorno = $this->curl( $this->getUrl( 'backend_api' ) . '/get-session-id', ['backend'=>TRUE] );
+    public function backEndGetSessionId( $token ){
+        $retorno = $this->curl( $this->getUrl( 'backend_api' ) . '/get-session-id', ['backend'=> ['token'=>$token] ] );
         return ( isset( $retorno['session_id'] ) ? $retorno['session_id'] : null );
     }
 
-    public function backEndSaveRegistro( $sessionID, $arrayValores ){
+    public function backEndcheckToken( $token ){
+        $ret     = $this->curl( $this->getUrl( 'backend_api' ) . '/check-token/' . $token );
+        $retorno = FALSE;
+        if( !empty( $ret ) && array_has( $ret, 'status' ) ){
+            unset($ret['status']);
+            $retorno = $ret;
+        }
+        return $retorno;
+    }
+
+    public function backEndSaveRegistro( $token, $sessionID, $arrayValores ){
         $json = json_encode( $arrayValores );
-        return $this->curl( $this->getUrl( 'backend_api' ) . '/registra', [ 'json' => true, 'post' => true, 'data' => $json, 'backend'=>$sessionID ] );
+        return $this->curl( $this->getUrl( 'backend_api' ) . '/registra', [
+            'json' => true,
+            'post' => true,
+            'data' => $json,
+            'backend'=>[
+                'token'      => $token,
+                'session_id' => $sessionID
+            ]
+        ] );
     }
 
-    public function backEndCreateOrder( $sessionID ){
-        return $this->curl( $this->getUrl( 'backend_api' ) . '/create', [ 'post' => true, 'backend'=>$sessionID ] );
+    public function backEndCreateOrder( $token, $sessionID ){
+        return $this->curl( $this->getUrl( 'backend_api' ) . '/create', [
+            'post' => true,
+            'backend'=>[
+                'token'      => $token,
+                'session_id' => $sessionID
+            ]
+        ] );
     }
 
-    public function backEndgetInfoOrder( $sessionID ){
-        return $this->curl( $this->getUrl( 'backend_api' ) . '/get', [ 'post' => true, 'backend'=>$sessionID ] );
+    public function backEndgetInfoOrder( $token, $sessionID ){
+        return $this->curl( $this->getUrl( 'backend_api' ) . '/get', [
+            'post' => true,
+            'backend'=>[
+                'token'      => $token,
+                'session_id' => $sessionID
+            ]
+        ] );
     }
 
     public function getIpPermission( $ip, $site ){
