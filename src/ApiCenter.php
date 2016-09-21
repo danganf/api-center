@@ -135,6 +135,14 @@ class ApiCenter
         ] );
     }
 
+    public function sendLead( $operadora, $arrayValores ){
+        return $this->curl( $this->getUrl( 'save_to_call_' . strtolower( $operadora ) ), [
+            'json' => true,
+            'post' => true,
+            'data' => json_encode( $arrayValores )
+        ] );
+    }
+
     public function getUrl($apiName){
         $retorno = $this->curl( config('app.url_api_center').$apiName.'/'.config('app.env') );
         return $retorno['url'];
