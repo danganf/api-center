@@ -41,15 +41,30 @@ class ApiCenter
     }
 
     public function getEstados(){
-        return $this->curl( $this->getUrl( 'estados' ) );
+
+        $value = \Cache::remember('getEstados', 360, function() {
+            return $this->curl( $this->getUrl( 'estados' ) );
+        });
+
+        return $value;
     }
 
     public function getUFPorDDD(){
-        return $this->curl( $this->getUrl( 'uf_por_ddd' ) );
+
+        $value = \Cache::remember('getUFPorDDD', 360, function() {
+            return $this->curl( $this->getUrl( 'uf_por_ddd' ) );
+        });
+
+        return $value;
     }
 
     public function getDDDPorUf(){
-        return $this->curl( $this->getUrl( 'ddd_por_uf' ) );
+
+        $value = \Cache::remember('getDDDPorUf', 360, function() {
+            return $this->curl( $this->getUrl( 'ddd_por_uf' ) );
+        });
+
+        return $value;
     }
 
     public function getValidaDados( $cpf, $nome, $mae, $dataNasc ){
