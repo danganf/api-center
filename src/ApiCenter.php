@@ -247,9 +247,9 @@ class ApiCenter
             }
 
             if ( !empty( $options['backend'] ) ) {
-                $dados[] = 'api-token: '.config('app.api_token');
-                if( !is_bool( $options['backend'] ) ) {
-                    $dados[] = 'session-id: '.$options['backend'];
+                $dados[] = 'api-token: '.$options['backend']['token'];
+                if( array_has($options['backend'], 'session_id') ) {
+                    $dados[] = 'session-id: '.$options['backend']['session_id'];
                 }
             }
 
