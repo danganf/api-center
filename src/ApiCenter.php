@@ -88,7 +88,7 @@ class ApiCenter
     public function backEndcheckToken( $token ){
         $ret     = $this->curl( $this->getUrl( 'backend_api' ) . '/check-token/' . $token );
         $retorno = FALSE;
-        if( !empty( $ret ) && array_has( $ret, 'status' ) ){
+        if( !empty( $ret ) && array_has( $ret, 'status' ) && $ret['status'] !== FALSE ){
             unset($ret['status']);
             $retorno = $ret;
         }
