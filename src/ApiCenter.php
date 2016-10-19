@@ -192,6 +192,18 @@ class ApiCenter
         ] );
     }
 
+    public function getAbandonosModalVendaOnLineVivo(){
+        return $this->curl( $this->getUrl( 'backend_api' ) . '/get-abandono' );
+    }
+
+    public function setProcessadoAbandonoModalVendaOnLineVivo( $leadID, $linhaServico ){
+        return $this->curl( $this->getUrl( 'backend_api' ) . '/set-processado-abandono/' . $leadID . '/' . $linhaServico );
+    }
+
+    public function getDetailOrder( $linha ){
+        return $this->curl( $this->getUrl( 'detail_order' ) . $linha );
+    }
+
     public function getUrl($apiName){
         $retorno = $this->curl( config('app.url_api_center').$apiName.'/'.config('app.env') );
         return $retorno['url'];
