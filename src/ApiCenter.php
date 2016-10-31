@@ -210,6 +210,10 @@ class ApiCenter
 
     }
 
+    public function sendMOLFila( $stringJson ){
+        return $this->curl($this->getUrl( 'send_mol' ), [ 'json' => true, 'post' => true, 'data' => $stringJson ] );
+    }
+
     private function parseReturn( $jsonString ){
 
         $json = json_decode( $jsonString, TRUE );
