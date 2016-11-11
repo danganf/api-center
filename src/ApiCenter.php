@@ -16,6 +16,20 @@ class ApiCenter
         return $this->curl( $this->getUrl( 'consulta_operadora' ) . $telefone );
     }
 
+    public function converteNonoDigito( $ddd, $linha ){
+
+        if( strlen($linha) == 8 ) {
+
+            $result = $this->curl($this->getUrl('convert_novo_digito') . $ddd . $linha);
+            if( !empty( $result ) ){
+                $linha = $result['linha'];
+                $linha = substr( $linha, 2, strlen( $linha ) );
+            }
+        }
+
+        return $linha;
+    }
+
     public function getVencimentoOperadora($operadora){
         return $this->curl( $this->getUrl( 'consulta_vencimento' ) . $operadora );
     }
