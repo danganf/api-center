@@ -267,6 +267,15 @@ class ApiCenter
         return $this->curl($this->getUrlBasic( 'send_mol' ), [ 'json' => true, 'post' => true, 'data' => $stringJson ] );
     }
 
+    public function urlShorten( $url ){
+        $retorno = $this->curl( $this->getUrlBasic( 'url_shorten'), [
+            'json' => true,
+            'post' => true,
+            'data' => json_encode( [ 'url' => $url ] )
+        ] );
+        return ( !empty( $retorno ) && !isset( $retorno['error'] ) ? $retorno['url'] : NULL );
+    }
+
     private function parseReturn( $jsonString ){
 
         $json = json_decode( $jsonString, TRUE );
