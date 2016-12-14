@@ -4,23 +4,35 @@ namespace Ufox;
 
 class ApiCenter
 {
+    private $timeCache = 720;
+
+    public function getUrlBasic( $name ){
+
+        $value = \Cache::remember("ApiCenter_$name", $this->timeCache, function() use($name) {
+            return $this->getUrl( $name );
+        });
+
+        return $value;
+
+    }
+
     public function getCep($cep){
-        return $this->curl( $this->getUrl( 'consulta_cep' ) . $cep );
+        return $this->curl( $this->getUrlBasic( 'central_api' ) . "/consulta-cep/$cep" );
     }
 
     public function getIp($ip){
-        return $this->curl( $this->getUrl( 'consulta_ip' ) . $ip );
+        return $this->curl( $this->getUrlBasic( 'central_api' ) . "/consulta-ip/$ip" );
     }
 
     public function getOperadora($telefone){
-        return $this->curl( $this->getUrl( 'consulta_operadora' ) . $telefone );
+        return $this->curl( $this->getUrlBasic( 'central_api' ) . "/consulta-operadora/$telefone" );
     }
 
     public function converteNonoDigito( $ddd, $linha ){
 
         if( strlen($linha) == 8 ) {
 
-            $result = $this->curl($this->getUrl('convert_novo_digito') . $ddd . $linha);
+            $result = $this->curl( $this->getUrlBasic('central_api') . "/consulta-nono-digito/$ddd$linha" );
             if( !empty( $result ) ){
                 $linha = $result['linha'];
                 $linha = substr( $linha, 2, strlen( $linha ) );
@@ -31,27 +43,32 @@ class ApiCenter
     }
 
     public function getVencimentoOperadora($operadora){
-        return $this->curl( $this->getUrl( 'consulta_vencimento' ) . $operadora );
+
+        $value = \Cache::remember("VencimentoOperadora_$operadora", $this->timeCache, function() use($operadora) {
+            return $this->curl( $this->getUrl( 'consulta_vencimento' ) . $operadora );
+        });
+
+        return $value;
     }
 
     public function getInfoCPF($cpf){
-        return $this->curl( $this->getUrl( 'consulta_cpf' ) . $cpf );
+        return $this->curl( $this->getUrlBasic( 'consulta_cpf' ) . $cpf );
     }
 
     public function getDetalhesSku($sku){
-        return $this->curl( $this->getUrl( 'consulta_detalhe' ) .'?skus='. $sku );
+        return $this->curl( $this->getUrlBasic( 'consulta_detalhe' ) .'?skus='. $sku );
     }
 
     public function getInfoCodRastreamento( $codigo ){
-        return $this->curl( $this->getUrl( 'consulta_cod_rastreamento' ) . $codigo );
+        return $this->curl( $this->getUrlBasic( 'central_api' ) . "/get-status-correios/$codigo" );
     }
 
     public function getPlanos( $ddd, $tipo = 'controle', $operadora = 'VIVO' ){
-        return $this->curl( $this->getUrl( 'consulta_planos' ) . "?operadora=$operadora&ddd=$ddd&tipo=$tipo" );
+        return $this->curl( $this->getUrlBasic( 'consulta_planos' ) . "?operadora=$operadora&ddd=$ddd&tipo=$tipo" );
     }
 
     public function getStoreMagento(){
-        return $this->curl( $this->getUrl( 'get_store' ) );
+        return $this->curl( $this->getUrlBasic( 'api_mag' ) . '/get-store' );
     }
 
     public function getEstados(){
@@ -82,7 +99,7 @@ class ApiCenter
     }
 
     public function getValidaDados( $cpf, $nome, $mae, $dataNasc ){
-        return $this->curl( $this->getUrl( 'valida_dados' ), [
+        return $this->curl( $this->getUrlBasic('central_api') . '/valida-dados', [
             'json' => true,
             'post' => true,
             'data' => json_encode( [ 'cpf'=>$cpf, 'nome_completo'=>$nome, 'mae'=>$mae, 'data_nascimento'=>$dataNasc ] )
@@ -90,17 +107,16 @@ class ApiCenter
     }
 
     public function createOrderMagento( $stringJson ){
-        $url = str_replace( 'manager_laravel.app','127.0.0.6:8000',$this->getUrl( 'envia_pedido' ) );#php artisan serve --host=127.0.0.6
-        return $this->curl($url, [ 'json' => true, 'post' => true, 'data' => $stringJson ] );
+        return $this->curl( $this->getUrlBasic( 'envia_pedido' ) , [ 'json' => true, 'post' => true, 'data' => $stringJson ] );
     }
 
     public function backEndGetSessionId( $token ){
-        $retorno = $this->curl( $this->getUrl( 'backend_api' ) . '/get-session-id', ['backend'=> ['token'=>$token] ] );
+        $retorno = $this->curl( $this->getUrlBasic( 'backend_api' ) . '/get-session-id', ['backend'=> ['token'=>$token] ] );
         return ( isset( $retorno['session_id'] ) ? $retorno['session_id'] : null );
     }
 
     public function backEndcheckToken( $token ){
-        $ret     = $this->curl( $this->getUrl( 'backend_api' ) . '/check-token/' . $token );
+        $ret     = $this->curl( $this->getUrlBasic( 'backend_api' ) . '/check-token/' . $token );
         $retorno = FALSE;
         if( !empty( $ret ) && array_has( $ret, 'status' ) && $ret['status'] !== FALSE ){
             unset($ret['status']);
@@ -111,7 +127,7 @@ class ApiCenter
 
     public function backEndSaveRegistro( $token, $sessionID, $arrayValores ){
         $json = json_encode( $arrayValores );
-        return $this->curl( $this->getUrl( 'backend_api' ) . '/registra', [
+        return $this->curl( $this->getUrlBasic( 'backend_api' ) . '/registra', [
             'json' => true,
             'post' => true,
             'data' => $json,
@@ -123,7 +139,7 @@ class ApiCenter
     }
 
     public function backEndCreateOrder( $token, $sessionID ){
-        return $this->curl( $this->getUrl( 'backend_api' ) . '/create', [
+        return $this->curl( $this->getUrlBasic( 'backend_api' ) . '/create', [
             'post' => true,
             'backend'=>[
                 'token'      => $token,
@@ -133,7 +149,30 @@ class ApiCenter
     }
 
     public function backEndgetInfoOrder( $token, $sessionID ){
-        return $this->curl( $this->getUrl( 'backend_api' ) . '/get', [
+        return $this->curl( $this->getUrlBasic( 'backend_api' ) . '/get', [
+            'post' => true,
+            'backend'=>[
+                'token'      => $token,
+                'session_id' => $sessionID
+            ]
+        ] );
+    }
+
+    public function backEndLogActivity( $token, $sessionID, $arrayValores ){
+        $json = json_encode( $arrayValores );
+        return $this->curl( $this->getUrlBasic( 'backend_api' ) . '/log-activity', [
+            'json' => true,
+            'post' => true,
+            'data' => $json,
+            'backend'=>[
+                'token'      => $token,
+                'session_id' => $sessionID
+            ]
+        ] );
+    }
+
+    public function backEndCheckStatusOrder( $token, $sessionID ){
+        return $this->curl( $this->getUrlBasic( 'backend_api' ) . '/check-status-order', [
             'post' => true,
             'backend'=>[
                 'token'      => $token,
@@ -143,7 +182,7 @@ class ApiCenter
     }
 
     public function getIpPermission( $ip, $site ){
-        return $this->curl( $this->getUrl( 'ip_permission' ), [
+        return $this->curl( $this->getUrlBasic( 'central_api' ) . '/ip-permission', [
             'json' => true,
             'post' => true,
             'data' => json_encode( [ 'ip'=>$ip, 'site'=>$site ] )
@@ -151,7 +190,7 @@ class ApiCenter
     }
 
     public function getOrderCustomer( $cpf, $codigoPedido=null, $nascimento=null ){
-        return $this->curl( $this->getUrl( 'get_order_customer' ), [
+        return $this->curl( $this->getUrlBasic( 'get_order_customer' ), [
             'json' => true,
             'post' => true,
             'data' => json_encode( [ 'cpf'=>$cpf, 'codigo_pedido'=>$codigoPedido, 'nascimento'=>$nascimento ] )
@@ -159,8 +198,8 @@ class ApiCenter
     }
 
     public function getCheckSMSOnLine(){
-        $ret   = $this->curl( $this->getUrl( 'verify_sms' ) );
-        $flag  = TRUE;
+        $ret  = $this->curl( $this->getUrlBasic( 'api_mag' ) . '/verify-sms' );
+        $flag = TRUE;
         if( isset( $ret['status'] ) ) {
             $flag = $ret['status'];
         }
@@ -174,7 +213,7 @@ class ApiCenter
         $dados['destinatario']['email'] = $email;
         $dados['data']                  = $outrosDados;
 
-        return $this->curl( $this->getUrl( 'envia_email' ), [
+        return $this->curl( $this->getUrlBasic( 'envia_email' ), [
             'json' => true,
             'post' => true,
             'data' => json_encode( $dados )
@@ -183,7 +222,7 @@ class ApiCenter
 
     public function saveLogAuditing( $arrayValores = [] ){
 
-        return $this->curl( $this->getUrl( 'save_log_auditing' ), [
+        return $this->curl( $this->getUrlBasic( 'central_api' ) . '/save-log-auditing', [
             'json' => true,
             'post' => true,
             'data' => json_encode( $arrayValores )
@@ -191,7 +230,7 @@ class ApiCenter
     }
 
     public function sendSMS( $origem, $ddd, $telefone, $mensagem, $ip ){
-        return $this->curl( $this->getUrl( 'envia_sms' ), [
+        return $this->curl( $this->getUrlBasic( 'central_api' ) . '/sms', [
             'json' => true,
             'post' => true,
             'data' => json_encode( [ 'origem'=>$origem, 'ip'=>$ip, 'linha'=>$ddd . $telefone, 'mensagem'=>$mensagem ] )
@@ -199,7 +238,7 @@ class ApiCenter
     }
 
     public function sendLead( $operadora, $arrayValores ){
-        return $this->curl( $this->getUrl( 'save_to_call_' . strtolower( $operadora ) ), [
+        return $this->curl( $this->getUrlBasic( 'save_to_call_' . strtolower( $operadora ) ), [
             'json' => true,
             'post' => true,
             'data' => json_encode( $arrayValores )
@@ -207,15 +246,15 @@ class ApiCenter
     }
 
     public function getAbandonosModalVendaOnLineVivo(){
-        return $this->curl( $this->getUrl( 'backend_api' ) . '/get-abandono' );
+        return $this->curl( $this->getUrlBasic( 'backend_api' ) . '/get-abandono' );
     }
 
     public function setProcessadoAbandonoModalVendaOnLineVivo( $leadID, $linhaServico ){
-        return $this->curl( $this->getUrl( 'backend_api' ) . '/set-processado-abandono/' . $leadID . '/' . $linhaServico );
+        return $this->curl( $this->getUrlBasic( 'backend_api' ) . '/set-processado-abandono/' . $leadID . '/' . $linhaServico );
     }
 
     public function getDetailOrder( $linha ){
-        return $this->curl( $this->getUrl( 'detail_order' ) . $linha );
+        return $this->curl( $this->getUrlBasic( 'detail_order' ) . $linha );
     }
 
     public function getUrl($apiName){
@@ -225,7 +264,7 @@ class ApiCenter
     }
 
     public function sendMOLFila( $stringJson ){
-        return $this->curl($this->getUrl( 'send_mol' ), [ 'json' => true, 'post' => true, 'data' => $stringJson ] );
+        return $this->curl($this->getUrlBasic( 'send_mol' ), [ 'json' => true, 'post' => true, 'data' => $stringJson ] );
     }
 
     private function parseReturn( $jsonString ){
@@ -297,9 +336,7 @@ class ApiCenter
         curl_setopt($ch, CURLOPT_REFERER, $refer );
 
         $result = curl_exec($ch);
-        if( strpos($url,'get-url-api') === FALSE ) {
-            //var_dump($url.' > '.$result);
-        }
+        //\Log::info( $url.' > '.$result );
         curl_close($ch);
 
         return $this->parseReturn( $result );
