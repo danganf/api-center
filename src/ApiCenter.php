@@ -24,6 +24,12 @@ class ApiCenter
         return $this->curl( $this->getUrlBasic( 'central_api' ) . "/consulta-ip/$ip" );
     }
 
+    public function getCodigoUF( $uf )
+    {
+        $result = $this->parseReturn( $this->curl( $this->getUrlBasic( 'central_api' ) . "/uf-codigo/$uf" ) );
+        return ( !empty( $result ) ? $result['codigo'] : NULL );
+    }
+
     public function getOperadora($telefone){
         return $this->curl( $this->getUrlBasic( 'central_api' ) . "/consulta-operadora/$telefone" );
     }
