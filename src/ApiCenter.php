@@ -282,6 +282,18 @@ class ApiCenter
         return ( !empty( $retorno ) && !isset( $retorno['error'] ) ? $retorno['url'] : NULL );
     }
 
+    public function getInfoPromocaoLP( $randKey ){
+        return $this->curl( $this->getUrlBasic( 'api_mag' ) . "/promocao/get/$randKey" );
+    }
+
+    public function getActionPromocaoLP( $arrayValores ){
+        return $this->curl( $this->getUrlBasic( 'api_mag') . "/promocao/action", [
+            'json' => true,
+            'post' => true,
+            'data' => json_encode( $arrayValores )
+        ] );
+    }
+
     private function parseReturn( $jsonString ){
 
         $json = json_decode( $jsonString, TRUE );
