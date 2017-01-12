@@ -286,6 +286,10 @@ class ApiCenter
         return $this->curl( $this->getUrlBasic( 'api_mag' ) . "/promocao/get/$randKey" );
     }
 
+    public function getPromoGigaPassNoProcess(){ return $this->curl( $this->getUrlBasic( 'api_mag' ) . "/promocao/get-no-process"); }
+    public function getPromoGigaPassNoProcessTotal(){ return $this->curl( $this->getUrlBasic( 'api_mag' ) . "/promocao/get-no-process/total"); }
+    public function getPromoGigaPassDetail($orderID){ return $this->curl( $this->getUrlBasic( 'api_mag' ) . "/promocao/get-detail/$orderID"); }
+
     public function getActionPromocaoLP( $arrayValores ){
         return $this->curl( $this->getUrlBasic( 'api_mag') . "/promocao/action", [
             'json' => true,
