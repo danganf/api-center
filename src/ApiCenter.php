@@ -16,22 +16,29 @@ class ApiCenter
 
     }
 
-    public function getCep($cep){
-        return $this->curl( $this->getUrlBasic( 'central_api' ) . "/consulta-cep/$cep" );
-    }
-
-    public function getIp($ip){
-        return $this->curl( $this->getUrlBasic( 'central_api' ) . "/consulta-ip/$ip" );
-    }
+    public function getCep( $cep ){ return $this->curl( $this->getUrlBasic( 'central_api' ) . "/consulta-cep/$cep" ); }
+    public function getIp( $ip ){ return $this->curl( $this->getUrlBasic( 'central_api' ) . "/consulta-ip/$ip" ); }
+    public function getOperadora( $telefone ){ return $this->curl( $this->getUrlBasic( 'central_api' ) . "/consulta-operadora/$telefone" ); }
+    public function getInfoCPF( $cpf ){ return $this->curl( $this->getUrlBasic( 'consulta_cpf' ) . $cpf ); }
+    public function getDetalhesSku( $sku ){ return $this->curl( $this->getUrlBasic( 'consulta_detalhe' ) .'?skus='. $sku ); }
+    public function getInfoCodRastreamento( $codigo ){ return $this->curl( $this->getUrlBasic( 'central_api' ) . "/get-status-correios/$codigo" ); }
+    public function getPlanos( $ddd, $tipo = 'controle', $operadora = 'VIVO' ){ return $this->curl( $this->getUrlBasic( 'consulta_planos' ) . "?operadora=$operadora&ddd=$ddd&tipo=$tipo" ); }
+    public function getStoreMagento(){ return $this->curl( $this->getUrlBasic( 'api_mag' ) . '/get-store' ); }
+    public function getInfoPromocaoLP( $randKey ){ return $this->curl( $this->getUrlBasic( 'api_mag' ) . "/promocao/get/$randKey" ); }
+    public function getPromoGigaPassNoProcess(){ return $this->curl( $this->getUrlBasic( 'api_mag' ) . "/promocao/get-no-process"); }
+    public function getPromoGigaPassNoProcessTotal(){ return $this->curl( $this->getUrlBasic( 'api_mag' ) . "/promocao/get-no-process/total"); }
+    public function getPromoGigaPassDetail( $orderID ){ return $this->curl( $this->getUrlBasic( 'api_mag' ) . "/promocao/get-detail/$orderID"); }
+    public function getChips( $operadora = 'VIVO' ){ return $this->curl( $this->getUrlBasic( 'consulta_chip' ) . $operadora ); }
+    public function sendMOLFila( $stringJson ){ return $this->curl($this->getUrlBasic( 'send_mol' ), [ 'json' => true, 'post' => true, 'data' => $stringJson ] ); }
+    public function createOrderMagento( $stringJson ){ return $this->curl( $this->getUrlBasic( 'envia_pedido' ) , [ 'json' => true, 'post' => true, 'data' => $stringJson ] ); }
+    public function getAbandonosModalVendaOnLineVivo(){ return $this->curl( $this->getUrlBasic( 'backend_api' ) . '/get-abandono' ); }
+    public function setProcessadoAbandonoModalVendaOnLineVivo( $leadID, $linhaServico ){ return $this->curl( $this->getUrlBasic( 'backend_api' ) . '/set-processado-abandono/' . $leadID . '/' . $linhaServico ); }
+    public function getDetailOrder( $linha ){ return $this->curl( $this->getUrlBasic( 'detail_order' ) . $linha ); }
 
     public function getCodigoUF( $uf )
     {
         $result = $this->parseReturn( $this->curl( $this->getUrlBasic( 'central_api' ) . "/uf-codigo/$uf" ) );
         return ( !empty( $result ) ? $result['codigo'] : NULL );
-    }
-
-    public function getOperadora($telefone){
-        return $this->curl( $this->getUrlBasic( 'central_api' ) . "/consulta-operadora/$telefone" );
     }
 
     public function converteNonoDigito( $ddd, $linha ){
@@ -55,26 +62,6 @@ class ApiCenter
         });
 
         return $value;
-    }
-
-    public function getInfoCPF($cpf){
-        return $this->curl( $this->getUrlBasic( 'consulta_cpf' ) . $cpf );
-    }
-
-    public function getDetalhesSku($sku){
-        return $this->curl( $this->getUrlBasic( 'consulta_detalhe' ) .'?skus='. $sku );
-    }
-
-    public function getInfoCodRastreamento( $codigo ){
-        return $this->curl( $this->getUrlBasic( 'central_api' ) . "/get-status-correios/$codigo" );
-    }
-
-    public function getPlanos( $ddd, $tipo = 'controle', $operadora = 'VIVO' ){
-        return $this->curl( $this->getUrlBasic( 'consulta_planos' ) . "?operadora=$operadora&ddd=$ddd&tipo=$tipo" );
-    }
-
-    public function getStoreMagento(){
-        return $this->curl( $this->getUrlBasic( 'api_mag' ) . '/get-store' );
     }
 
     public function getEstados(){
@@ -110,10 +97,6 @@ class ApiCenter
             'post' => true,
             'data' => json_encode( [ 'cpf'=>$cpf, 'nome_completo'=>$nome, 'mae'=>$mae, 'data_nascimento'=>$dataNasc ] )
         ] );
-    }
-
-    public function createOrderMagento( $stringJson ){
-        return $this->curl( $this->getUrlBasic( 'envia_pedido' ) , [ 'json' => true, 'post' => true, 'data' => $stringJson ] );
     }
 
     public function backEndGetSessionId( $token ){
@@ -251,26 +234,10 @@ class ApiCenter
         ] );
     }
 
-    public function getAbandonosModalVendaOnLineVivo(){
-        return $this->curl( $this->getUrlBasic( 'backend_api' ) . '/get-abandono' );
-    }
-
-    public function setProcessadoAbandonoModalVendaOnLineVivo( $leadID, $linhaServico ){
-        return $this->curl( $this->getUrlBasic( 'backend_api' ) . '/set-processado-abandono/' . $leadID . '/' . $linhaServico );
-    }
-
-    public function getDetailOrder( $linha ){
-        return $this->curl( $this->getUrlBasic( 'detail_order' ) . $linha );
-    }
-
     public function getUrl($apiName){
         $retorno = $this->curl( config('app.url_api_center').$apiName.'/'.config('app.env') );
         return $retorno['url'];
 
-    }
-
-    public function sendMOLFila( $stringJson ){
-        return $this->curl($this->getUrlBasic( 'send_mol' ), [ 'json' => true, 'post' => true, 'data' => $stringJson ] );
     }
 
     public function urlShorten( $url ){
@@ -281,14 +248,6 @@ class ApiCenter
         ] );
         return ( !empty( $retorno ) && !isset( $retorno['error'] ) ? $retorno['url'] : NULL );
     }
-
-    public function getInfoPromocaoLP( $randKey ){
-        return $this->curl( $this->getUrlBasic( 'api_mag' ) . "/promocao/get/$randKey" );
-    }
-
-    public function getPromoGigaPassNoProcess(){ return $this->curl( $this->getUrlBasic( 'api_mag' ) . "/promocao/get-no-process"); }
-    public function getPromoGigaPassNoProcessTotal(){ return $this->curl( $this->getUrlBasic( 'api_mag' ) . "/promocao/get-no-process/total"); }
-    public function getPromoGigaPassDetail($orderID){ return $this->curl( $this->getUrlBasic( 'api_mag' ) . "/promocao/get-detail/$orderID"); }
 
     public function getActionPromocaoLP( $arrayValores ){
         return $this->curl( $this->getUrlBasic( 'api_mag') . "/promocao/action", [
