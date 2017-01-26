@@ -234,6 +234,20 @@ class ApiCenter
         ] );
     }
 
+    public function saveCostGoogleAd( $arrayValores = [] ){
+
+        return $this->curl( $this->getUrl( 'api_mag' ) . "/cost-google-adwords/save", [
+            'json' => true,
+            'post' => true,
+            'data' => json_encode( $arrayValores )
+        ] );
+    }
+
+    public function getCostGoogleAd( $pass, $limit = 10 ){
+
+        return $this->curl( $this->getUrl( 'api_mag' ) . "/cost-google-adwords/get/$pass/$limit");
+    }
+
     public function getUrl($apiName){
         $retorno = $this->curl( config('app.url_api_center').$apiName.'/'.config('app.env') );
         return $retorno['url'];
