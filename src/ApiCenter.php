@@ -34,6 +34,7 @@ class ApiCenter
     public function getAbandonosModalVendaOnLineVivo(){ return $this->curl( $this->getUrlBasic( 'backend_api' ) . '/get-abandono' ); }
     public function setProcessadoAbandonoModalVendaOnLineVivo( $leadID, $linhaServico ){ return $this->curl( $this->getUrlBasic( 'backend_api' ) . '/set-processado-abandono/' . $leadID . '/' . $linhaServico ); }
     public function getDetailOrder( $linha ){ return $this->curl( $this->getUrlBasic( 'detail_order' ) . $linha ); }
+    public function getStoreInfo($storeID){ return $this->curl( $this->getUrlBasic( 'api_mag' ) .'/store-info/'. $storeID ); }
 
     public function getCodigoUF( $uf )
     {
