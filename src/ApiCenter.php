@@ -38,7 +38,7 @@ class ApiCenter
 
     public function getCodigoUF( $uf )
     {
-        $result = $this->parseReturn( $this->curl( $this->getUrlBasic( 'central_api' ) . "/uf-codigo/$uf" ) );
+        $result = $this->curl( $this->getUrlBasic( 'central_api' ) . "/uf-codigo/$uf" );
         return ( !empty( $result ) ? $result['codigo'] : NULL );
     }
 
@@ -179,11 +179,17 @@ class ApiCenter
         ] );
     }
 
-    public function getOrderCustomer( $cpf, $codigoPedido=null, $nascimento=null ){
+    public function getOrderCustomer( $cpf=null, $codigoPedido=null, $nascimento=null ){
+
+        $dadosSend = [];
+
+        if( !empty( $codigoPedido ) ){$dadosSend['codigo_pedido'] = $codigoPedido;}
+        else {$dadosSend = [ 'cpf'=>$cpf, 'nascimento'=>$nascimento ];}
+
         return $this->curl( $this->getUrlBasic( 'get_order_customer' ), [
             'json' => true,
             'post' => true,
-            'data' => json_encode( [ 'cpf'=>$cpf, 'codigo_pedido'=>$codigoPedido, 'nascimento'=>$nascimento ] )
+            'data' => json_encode( $dadosSend )
         ] );
     }
 
