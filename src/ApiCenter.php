@@ -278,6 +278,14 @@ class ApiCenter
         ] );
     }
 
+    public function sendDiscadorUnico( $dados ){
+        return $this->curl( $this->getUrlBasic( 'discador' ) . 'register-lead', [
+            'json' => true,
+            'post' => true,
+            'data' => json_encode( $dados )
+        ] );
+    }
+
     private function parseReturn( $jsonString ){
 
         $json = json_decode( $jsonString, TRUE );
