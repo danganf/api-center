@@ -35,6 +35,7 @@ class ApiCenter
     public function setProcessadoAbandonoModalVendaOnLineVivo( $leadID, $linhaServico ){ return $this->curl( $this->getUrlBasic( 'backend_api' ) . '/set-processado-abandono/' . $leadID . '/' . $linhaServico ); }
     public function getDetailOrder( $linha ){ return $this->curl( $this->getUrlBasic( 'detail_order' ) . $linha ); }
     public function getStoreInfo($storeID){ return $this->curl( $this->getUrlBasic( 'api_mag' ) .'/store-info/'. $storeID ); }
+    public function getProgressOrderCustomer( $cpf ){ return $this->curl( $this->getUrlBasic( 'api_mag' ) . '/order-progress-customer/' . $cpf ); }
 
     public function getCodigoUF( $uf )
     {
@@ -171,6 +172,10 @@ class ApiCenter
         ] );
     }
 
+    public function backEndGetForContinue( $sessionID ){
+        return $this->curl( $this->getUrlBasic( 'backend_api' ) . '/get-for-continue/' . $sessionID );
+    }
+
     public function getIpPermission( $ip, $site ){
         return $this->curl( $this->getUrlBasic( 'central_api' ) . '/ip-permission', [
             'json' => true,
@@ -233,6 +238,21 @@ class ApiCenter
         ] );
     }
 
+    public function sendTorpedoVoz( $origem, $ddd, $telefone, $mensagem, $ip ){
+        return $this->curl( $this->getUrlBasic( 'central_api' ) . '/torpedo/send', [
+            'json' => true,
+            'post' => true,
+            'data' => json_encode( [ 'action'=> 'voz', 'origem'=>$origem, 'ip'=>$ip, 'telefone'=>$ddd . $telefone, 'mensagem'=>$mensagem ] )
+        ] );
+    }
+
+    public function getTorpedoSaldo( $tipo = 'voz' ){
+        $retorno = $this->curl( $this->getUrlBasic( 'central_api' ) . '/torpedo/saldo', [ 'timeout' => 3 ]);
+        $saldo   = 0;
+        if( $retorno ){ $saldo = array_get( $retorno, 'attributes.saldo_' . strtolower( $tipo ), $saldo ); }
+        return $saldo;
+    }
+
     public function sendLead( $operadora, $arrayValores ){
         return $this->curl( $this->getUrlBasic( 'save_to_call_' . strtolower( $operadora ) ), [
             'json' => true,
@@ -284,6 +304,13 @@ class ApiCenter
             'post' => true,
             'data' => json_encode( $dados )
         ] );
+    }
+
+    public function checkFlowAuto(){
+        $ret  = $this->curl( $this->getUrlBasic( 'api_mag' ) . '/verify-flow' );
+        $flag = TRUE;
+        if( isset( $ret['status'] ) &&  $ret['status'] == 'MANUAL' ) {$flag = FALSE;}
+        return $flag;
     }
 
     private function parseReturn( $jsonString ){
